@@ -315,7 +315,7 @@ model = model.to(device=device)
 
 lossfunc = nn.CrossEntropyLoss()
 
-optimizer = optim.SGD(model.parameters(), lr=0.5, momentum=0.9, weight_decay=5e-4)
+optimizer = optim.SGD(model.parameters(), lr=0.0001, momentum=1, weight_decay=5e-4)
 scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
 
 print("model, loss, optimizer and scheduler setup done")
