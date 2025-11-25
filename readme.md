@@ -16,6 +16,7 @@ implementation of the paper [ghostnet paper](https://arxiv.org/abs/1911.11907)
 | --- | -------- | --------- | --------- | --------------------- | -------------- | --------------- | ------ | ---------------- |
 | 1   | 2        | 3         | SGD       | CosineAnnealing       | 92.20%         | 92.7%           | 200    | gr_cosine.pth    |
 | 2   | 2        | 3         | SGD       | MultiStepLR(100, 500) | 92.55%         | 92.7%           | 200    | gr_multistep.pth |
+| 3   | 2        | 3         | SGD       | CosineAnnealing.      | 91.30%         | 92.7%           | 200    | ghost-resnet-trial.py |
 
 - total feature maps = s \* number of intrinsic feature maps (produced by ordinary convolution filters)
 - `images/ghost_visualization.png` (dog's image, cifar index=12) proves that ghost map preserves the exact same shape and pose as the intrinsic maps
@@ -45,6 +46,7 @@ experiment run on cifar-10 using a dynamic layer replacement strategy (swapping 
 | no. | ratio(s) | kernel(d) | optimizer | lr_scheduler    | accuracy(ours) | accuracy(paper) | epochs | file         |
 | --- | -------- | --------- | --------- | --------------- | -------------- | --------------- | ------ | ------------ |
 | 1   | 2        | 3         | SGD       | CosineAnnealing | 93.63%         | 93.7%           | 200    | ghost-vgg.py |
+| 1   | 2        | 3         | SGD       | CosineAnnealing | 92.83%         | 93.7%           | 200    | ghost-vgg-trial.py |
 
 - **convergence**: achieved 93.60% accuracy at epoch 200. best accuracy observed was ~93.63%.
 - **computational reduction**:
