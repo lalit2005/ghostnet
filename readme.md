@@ -66,10 +66,10 @@ parameter reduction: 48.97% (approx 1.96x)
 
 ### faster-r-cnn with ghostnet backbone
 
-| no. | ratio(s) | kernel(d)     | optimizer | lr_scheduler     | accuracy(ours) | accuracy(paper) | epochs | file                    |
+| no. | ratio(s) | kernel(d)     | optimizer | lr_scheduler     | mAP            | mAP             | epochs | file                    |
 | --- | -------- | ------------- | --------- | ---------------- | -------------- | --------------- | ------ | ----------------------- |
-| 1   | 2        | 3,5(varied)   | sgd       | constant(0.005)  | 8.5% map       | 26.9%           | 12     | ghostnet_faster_rcnn    |
-| 2   | 2        | 3, 5 (varied) | sgd       | constant (0.005) | 9.4%           | 9.4%\*          | 9      | `faster-rcnn-run-2/...` |
+| 1   | 2        | 3,5(varied)   | sgd       | constant(0.005)  | 8.5%           | 26.9%           | 12     | ghostnet_faster_rcnn    |
+| 2   | 2        | 3, 5 (varied) | sgd       | constant (0.005) | 9.4%           | 26.9%           | 9      | `faster-rcnn-run-2/...` |
 
 - the models mentioned in the paper used sgd for 12 epochs from imagenet pretrained weights, but our model was trained from scratch. hence there's a huge difference in map between the paper's results and ours
 - **note on run 2:** run 2 utilized a larger batch size `b=8` resulting in faster convergence and slightly higher accuracy (9.4%) in fewer epochs compared to run 1.
@@ -104,13 +104,6 @@ To test the backbone's versatility, we integrated it into a One-Stage Detector (
 
 we extended the paper's analysis by testing extreme ratios `s` on resnet-56 to find the limit of redundancy.
 
-| Model                  | Ratio (s) | FLOPs (M) | Params (M) | FLOPs Reduct. | Params Reduct. | Accuracy (CIFAR-10) |
-| :--------------------- | :-------: | :-------: | :--------: | :-----------: | :------------: | :-----------------: |
-| **Standard ResNet-56** |     1     |  127.93   |    0.86    |     1.00x     |     1.00x      |       93.00%        |
-| **Ghost-ResNet-56**    |     2     |   67.50   |    0.44    |     1.90x     |     1.95x      |       92.55%        |
-| **Ghost-ResNet-56**    |     3     |   50.29   |    0.31    |     2.54x     |     2.74x      |       91.54%        |
-| **Ghost-ResNet-56**    |     5     |   34.98   |    0.20    |     3.66x     |     4.31x      |       90.62%        |
-| **Ghost-ResNet-56**    |    10     |   22.67   |    0.12    |     5.64x     |     7.06x      |       88.47%        |
-| **Ghost-ResNet-56**    |    20     |   22.67   |    0.12    |     5.64x     |     7.06x      |       88.47%        |
+<img width="897" height="226" alt="image" src="https://github.com/user-attachments/assets/d8afc9ad-5aeb-4ebe-a0f7-987316c182c9" />
 
 > **discovery:** we found that we can remove 90% of the standard convolution calculations `s=10` and replace them with cheap linear operations while losing less than 4.5% accuracy. this suggests massive redundancy in standard resnet features.
