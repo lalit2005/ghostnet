@@ -105,7 +105,7 @@ def ResNet56():
     # 1 conv1 + 3 stages * 9 blocks/stage * 2 convs/block + 1 (linear) = 56 layers
     return ResNet(BasicBlock, [9, 9, 9])
 
-def convert_to_ghost_resnet(model, ratio=2, dw_kernel_size=3):
+def convert_to_ghost_resnet(model, ratio=0, dw_kernel_size=3):
     for name, module in model.named_children():
         if isinstance(module, nn.Conv2d):
             in_channels = module.in_channels
@@ -134,7 +134,7 @@ print("======================================")
 model = ResNet56()
 # # print(model)
 #
-convert_to_ghost_resnet(model, ratio = 3, dw_kernel_size = 3)
+convert_to_ghost_resnet(model, ratio = 20, dw_kernel_size = 3)
 #
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
@@ -336,30 +336,35 @@ print(f"Paper Target: 92.7%")
 # from thop import profile
 # from copy import deepcopy
 #
-# def count_parameters(model):
-#     return sum(p.numel() for p in model.parameters() if p.requires_grad)
-#
 # def compare_efficiency():
-#     print("creating standard resnet-56...")
+#     # mimicing dummy cifar-10 input
+#     input_tensor = torch.randn(1, 3, 32, 32)
+#
+#     print("Creating and measuring Standard ResNet-56...")
 #     standard_model = ResNet56()
-#     print("creating ghost-resnet-56 (s=2)...")
-#     ghost_model = deepcopy(standard_model)
-#     convert_to_ghost_resnet(ghost_model, ratio=2, dw_kernel_size=3)
-#     input_tensor = torch.randn(1, 3, 32, 32) # dummy input
-#
-#     print("\nmeasuring standard resnet-56...")
 #     flops_std, params_std = profile(standard_model, inputs=(input_tensor, ), verbose=False)
-#     print(f"  flops: {flops_std / 1e6:.2f} m")
-#     print(f"  params: {params_std / 1e6:.2f} m")
 #
-#     print("\nmeasuring ghost-resnet-56...")
-#     flops_ghost, params_ghost = profile(ghost_model, inputs=(input_tensor, ), verbose=False)
-#     print(f"  flops: {flops_ghost / 1e6:.2f} m")
-#     print(f"  params: {params_ghost / 1e6:.2f} m")
+#     print(f"  [Standard] FLOPs: {flops_std / 1e6:.2f} M")
+#     print(f"  [Standard] Params: {params_std / 1e6:.2f} M")
+#     print("-" * 50)
 #
-#     print("\nresults:")
-#     print(f"  flops reduction: {flops_std / flops_ghost:.2f}x (paper claims ~2x)")
-#     print(f"  param reduction: {params_std / params_ghost:.2f}x (paper claims ~2x)")
+#     ratios_to_test = [2, 3, 5, 10]
+#
+#     for s in ratios_to_test:
+#         print(f"\nCreating Ghost-ResNet-56 (ratio s={s})...")
+#
+#         ghost_model = deepcopy(standard_model)
+#         convert_to_ghost_resnet(ghost_model, ratio=s, dw_kernel_size=3)
+#
+#         flops_ghost, params_ghost = profile(ghost_model, inputs=(input_tensor, ), verbose=False)
+#
+#         flops_reduction = flops_std / flops_ghost
+#         param_reduction = params_std / params_ghost
+#
+#         print(f"  [s={s}] FLOPs: {flops_ghost / 1e6:.2f} M")
+#         print(f"  [s={s}] Params: {params_ghost / 1e6:.2f} M")
+#         print(f"  >>> FLOPs Reduction: {flops_reduction:.2f}x")
+#         print(f"  >>> Param Reduction: {param_reduction:.2f}x")
 #
 # if __name__ == "__main__":
 #     compare_efficiency()
