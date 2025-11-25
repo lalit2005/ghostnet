@@ -43,10 +43,10 @@ results:
 
 experiment run on cifar-10 using a dynamic layer replacement strategy (swapping `nn.conv2d` for `ghostmodule`).
 
-| no. | ratio(s) | kernel(d) | optimizer | lr_scheduler    | accuracy(ours) | accuracy(paper) | epochs | file               |
-| --- | -------- | --------- | --------- | --------------- | -------------- | --------------- | ------ | ------------------ |
-| 1   | 2        | 3         | SGD       | CosineAnnealing | 93.63%         | 93.7%           | 200    | ghost-vgg.py       |
-| 2   | 2        | 3         | SGD       | CosineAnnealing | 92.83%         | 93.7%           | 200    | ghost-vgg-trial.py |
+| no. | ratio(s) | kernel(d) | optimizer | lr_scheduler    | accuracy(ours) | accuracy(paper) | epochs | file                        |
+| --- | -------- | --------- | --------- | --------------- | -------------- | --------------- | ------ | --------------------------- |
+| 1   | 2        | 3         | SGD       | CosineAnnealing | 93.63%         | 93.7%           | 200    | ghost-vgg.py                |
+| 2   | 2        | 3         | SGD       | CosineAnnealing | 92.83%         | 93.7%           | 200    | ghost-vgg-trial.py          |
 | 3   | 2        | 3         | SGD       | CosineAnnealing | 92.89%         | 93.7%           | 200    | ghost_vgg_with_val_split.py |
 
 - **convergence**: achieved 93.60% accuracy at epoch 200. best accuracy observed was ~93.63%.
@@ -66,11 +66,13 @@ parameter reduction: 48.97% (approx 1.96x)
 
 ### faster-r-cnn with ghostnet backbone
 
-| no. | ratio(s) | kernel(d)   | optimizer | lr_scheduler    | accuracy(ours) | accuracy(paper) | epochs | file                 |
-| --- | -------- | ----------- | --------- | --------------- | -------------- | --------------- | ------ | -------------------- |
-| 1   | 2        | 3,5(varied) | sgd       | constant(0.005) | 8.5% map       | 26.9%           | 12     | ghostnet_faster_rcnn |
+| no. | ratio(s) | kernel(d)     | optimizer | lr_scheduler     | accuracy(ours) | accuracy(paper) | epochs | file                    |
+| --- | -------- | ------------- | --------- | ---------------- | -------------- | --------------- | ------ | ----------------------- |
+| 1   | 2        | 3,5(varied)   | sgd       | constant(0.005)  | 8.5% map       | 26.9%           | 12     | ghostnet_faster_rcnn    |
+| 2   | 2        | 3, 5 (varied) | sgd       | constant (0.005) | 9.4%           | 9.4%\*          | 9      | `faster-rcnn-run-2/...` |
 
 - the models mentioned in the paper used sgd for 12 epochs from imagenet pretrained weights, but our model was trained from scratch. hence there's a huge difference in map between the paper's results and ours
+- **note on run 2:** run 2 utilized a larger batch size `b=8` resulting in faster convergence and slightly higher accuracy (9.4%) in fewer epochs compared to run 1.
 - the paper used 1.1 as the width multiplier, but we used 1.0 as the width multiplier to decrease the computation required
 - but the decrease in computation between mobile net models is consistent with the paper. the model uses half the compute of what mobilenet uses. our model can match the results of mobilenet if trained for more epochs
 
@@ -92,7 +94,7 @@ To test the backbone's versatility, we integrated it into a One-Stage Detector (
 
 | No. | Ratio(s) | Kernel(d) | Optimizer | LR Scheduler | Accuracy (Ours) | Epochs | File            |
 | --- | -------- | --------- | --------- | ------------ | --------------- | ------ | --------------- |
-| 1   | 2        | 3,5       | SGD       | MultiStep    | 2.58% mAP\*      | 6      | ghost_retinanet |
+| 1   | 2        | 3,5       | SGD       | MultiStep    | 2.58% mAP\*     | 6      | ghost_retinanet |
 
 - training was halted at epoch 6 due to time constraints. the learning curve (see plots) shows consistent convergence, verifying the backbone works for one-stage detectors.
 
@@ -102,10 +104,13 @@ To test the backbone's versatility, we integrated it into a One-Stage Detector (
 
 we extended the paper's analysis by testing extreme ratios `s` on resnet-56 to find the limit of redundancy.
 
-| Ratio ($s$)   | Intrinsic Features | Ghost Features | FLOPs Reduction | Accuracy (CIFAR-10) |
-| :------------ | :----------------- | :------------- | :-------------- | :------------------ |
-| **2** (Paper) | 50%                | 50%            | ~2x             | 92.6%               |
-| **5** (Ours)  | **20%**            | **80%**        | **~3.6x**       | **90.4%**           |
-| **10** (Ours) | **10%**            | **90%**        | **~5.6x**       | **88.5%**           |
+| Model                  | Ratio (s) | FLOPs (M) | Params (M) | FLOPs Reduct. | Params Reduct. | Accuracy (CIFAR-10) |
+| :--------------------- | :-------: | :-------: | :--------: | :-----------: | :------------: | :-----------------: |
+| **Standard ResNet-56** |     1     |  127.93   |    0.86    |     1.00x     |     1.00x      |       93.00%        |
+| **Ghost-ResNet-56**    |     2     |   67.50   |    0.44    |     1.90x     |     1.95x      |       92.55%        |
+| **Ghost-ResNet-56**    |     3     |   50.29   |    0.31    |     2.54x     |     2.74x      |       91.54%        |
+| **Ghost-ResNet-56**    |     5     |   34.98   |    0.20    |     3.66x     |     4.31x      |       90.62%        |
+| **Ghost-ResNet-56**    |    10     |   22.67   |    0.12    |     5.64x     |     7.06x      |       88.47%        |
+| **Ghost-ResNet-56**    |    20     |   22.67   |    0.12    |     5.64x     |     7.06x      |       88.47%        |
 
 > **discovery:** we found that we can remove 90% of the standard convolution calculations `s=10` and replace them with cheap linear operations while losing less than 4.5% accuracy. this suggests massive redundancy in standard resnet features.
