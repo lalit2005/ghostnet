@@ -12,14 +12,15 @@ implementation of the paper [ghostnet paper](https://arxiv.org/abs/1911.11907)
 
 ### ghostnet-resnet-56
 
-| Model Architecture | Ratio (s)    | FLOPs (M) | Params (M) | FLOPs Reduct. | Params Reduct. | Accuracy (CIFAR-10) |
-| ------------------ | ------------ | --------- | ---------- | ------------- | -------------- | ------------------- |
-| Standard ResNet-56 | 1 (Baseline) | 127.93    | 0.86       | 1.00x         | 1.00x          | 93.00%              |
-| Ghost-ResNet-56    | 2            | 67.50     | 0.44       | 1.90x         | 1.95x          | 92.55%              |
-| Ghost-ResNet-56    | 3            | 50.29     | 0.31       | 2.54x         | 2.74x          | 91.54%              |
-| Ghost-ResNet-56    | 5            | 34.98     | 0.20       | 3.66x         | 4.31x          | 90.62%              |
-| Ghost-ResNet-56    | 10           | 22.67     | 0.12       | 5.64x         | 7.06x          | 88.47%              |
-| Ghost-ResNet-56    | 20           | 15.86      | 0.08       | 8.07         | 10.59         | 84.3%              |
+| no. | ratio(s) | kernel(d) | optimizer | lr_scheduler          | accuracy(ours) | accuracy(paper) | epochs | file                  |
+| --- | -------- | --------- | --------- | --------------------- | -------------- | --------------- | ------ | --------------------- |
+| 1   | 2        | 3         | SGD       | CosineAnnealing       | 92.20%         | 92.7%           | 200    | gr_cosine.pth         |
+| 2   | 2        | 3         | SGD       | MultiStepLR(100, 500) | 92.55%         | 92.7%           | 200    | gr_multistep.pth      |
+| 3   | 2        | 3         | SGD       | CosineAnnealing       | 91.30%         | 92.7%           | 200    | ghost-resnet-trial.py |
+| 4   | 3        | 3         | SGD       | CosineAnnealing       | 91.54%         | 92.7%           | 200    | ghost_resnet.py       |
+| 5   | 5        | 3         | SGD       | CosineAnnealing       | 90.62%         | 92.7%           | 200    | ghost_resnet.py       |
+| 6   | 10       | 5         | SGD       | CosineAnnealing       | 88.47%         | 92.7%           | 200    | ghost_resnet.py       |
+| 7   | 20       | 5         | SGD       | CosineAnnealing       | 84.30%         | 92.7%           | 200    | ghost_resnet.py       |
 
 - total feature maps = s \* number of intrinsic feature maps (produced by ordinary convolution filters)
 - `images/ghost_visualization.png` (dog's image, cifar index=12) proves that ghost map preserves the exact same shape and pose as the intrinsic maps
@@ -107,6 +108,15 @@ To test the backbone's versatility, we integrated it into a One-Stage Detector (
 
 we extended the paper's analysis by testing extreme ratios `s` on resnet-56 to find the limit of redundancy.
 
-<img width="897" height="226" alt="image" src="https://github.com/user-attachments/assets/d8afc9ad-5aeb-4ebe-a0f7-987316c182c9" />
+<!--<img width="897" height="226" alt="image" src="https://github.com/user-attachments/assets/d8afc9ad-5aeb-4ebe-a0f7-987316c182c9" />-->
 
-> **discovery:** we found that we can remove 90% of the standard convolution calculations `s=10` and replace them with cheap linear operations while losing less than 4.5% accuracy. this suggests massive redundancy in standard resnet features.
+| Model Architecture | Ratio (s)    | FLOPs (M) | Params (M) | FLOPs Reduct. | Params Reduct. | Accuracy (CIFAR-10) |
+| ------------------ | ------------ | --------- | ---------- | ------------- | -------------- | ------------------- |
+| Standard ResNet-56 | 1 (Baseline) | 127.93    | 0.86       | 1.00x         | 1.00x          | 93.00%              |
+| Ghost-ResNet-56    | 2            | 67.50     | 0.44       | 1.90x         | 1.95x          | 92.55%              |
+| Ghost-ResNet-56    | 3            | 50.29     | 0.31       | 2.54x         | 2.74x          | 91.54%              |
+| Ghost-ResNet-56    | 5            | 34.98     | 0.20       | 3.66x         | 4.31x          | 90.62%              |
+| Ghost-ResNet-56    | 10           | 22.67     | 0.12       | 5.64x         | 7.06x          | 88.47%              |
+| Ghost-ResNet-56    | 20           | 15.86     | 0.08       | 8.07          | 10.59          | 84.3%               |
+
+- **discovery:** we found that we can remove 90% of the standard convolution calculations `s=10` and replace them with cheap linear operations while losing less than 4.5% accuracy. this suggests massive redundancy in standard resnet features.
