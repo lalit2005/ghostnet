@@ -46,9 +46,11 @@ experiment run on cifar-10 using a dynamic layer replacement strategy (swapping 
 | no. | ratio(s) | kernel(d) | optimizer | lr_scheduler    | accuracy(ours) | accuracy(paper) | epochs | file               |
 | --- | -------- | --------- | --------- | --------------- | -------------- | --------------- | ------ | ------------------ |
 | 1   | 2        | 3         | SGD       | CosineAnnealing | 93.63%         | 93.7%           | 200    | ghost-vgg.py       |
-| 1   | 2        | 3         | SGD       | CosineAnnealing | 92.83%         | 93.7%           | 200    | ghost-vgg-trial.py |
+| 2   | 2        | 3         | SGD       | CosineAnnealing | 92.83%         | 93.7%           | 200    | ghost-vgg-trial.py |
+| 3   | 2        | 3         | SGD       | CosineAnnealing | 92.89%         | 93.7%           | 200    | ghost_vgg_with_val_split.py |
 
 - **convergence**: achieved 93.60% accuracy at epoch 200. best accuracy observed was ~93.63%.
+- the third run used train-val-test dataset splits, though the paper & other 2 runs use train-test split
 - **computational reduction**:
 
 ```
