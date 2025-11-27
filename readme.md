@@ -8,6 +8,9 @@ implementation of the paper [ghostnet paper](https://arxiv.org/abs/1911.11907)
 - run `python ghostnet.py`
 - to download ghostnet weights pretrained on imagenet, run `python download-imagenet-weights.py`
 
+
+> the `images` folder contains the plots and other visual results
+
 ### experiments
 
 ### ghostnet-resnet-56
