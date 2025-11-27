@@ -123,3 +123,11 @@ we extended the paper's analysis by testing extreme ratios `s` on resnet-56 to f
 | Ghost-ResNet-56    | 20           | 15.86     | 0.08       | 8.07          | 10.59          | 84.3%               |
 
 - **discovery:** we found that we can remove 90% of the standard convolution calculations `s=10` and replace them with cheap linear operations while losing less than 4.5% accuracy. this suggests massive redundancy in standard resnet features.
+
+---
+#### credits
+- Bhargav (@bvn1904)
+- Anjali (@KamathAnjali)
+- Lalit (@lalit2005)
+
+ps. llms were used for generating the skeleton and other tiny side-scripts(such as plotting and dataset downloading scripts) and for conceptual understanding, though most of the core implementation of the ghostnet architecture was done by us
